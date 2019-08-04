@@ -17,6 +17,7 @@ protected:
 	int _health;
 	float _speed;
 	float _width, _height;
+	glm::vec2 _lastPosition;
 	glm::vec2 _position;
 	glm::vec4 _uvRect;
 	PlutusEngine::ColorRGBA8 _color;
@@ -41,6 +42,8 @@ public:
 	glm::vec2 getPosition() const { return _position; }
 
 	bool applyDamage(int damage);
+
+	Character* Character::getNearestCharacter(std::vector<Character*>& character, float distance);
 
 protected:
 	void checkTilePosition(std::vector<glm::vec2>& collideTilePosition,

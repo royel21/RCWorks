@@ -12,6 +12,7 @@ Player::Player(
 {
 	_speed = speed;
 	_position = pos;
+	_lastPosition = pos;
 	_width = 60;
 	_height = 60;
 	_input = input;
@@ -65,13 +66,14 @@ void Player::update(const std::vector<std::string>& levelData,
 		glm::vec2 direction = glm::normalize(mCoords - centerPos);
 
 		_guns[_currentGun]->update(
-			_input->isKeyPressed(SDL_BUTTON_LEFT),
+			_input->isKeyDown(SDL_BUTTON_LEFT),
 			_position, 
 			direction, 
-			*_bullets);
+			*_bullets,
+			deltaTime);
 	}
 
-	collideWithLevel(levelData);
+	collideWithLevel(levelData); 
 }
 
 void Player::addGun(Gun* gun)

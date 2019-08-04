@@ -20,7 +20,7 @@ private:
 	float _bulletSpeed;
 	int _bulletDamage;
 	int _bulletForShot; // How many bullets are fire at a time
-	int _frameCount;
+	float _frameCount;
 
 public:
 	Gun(
@@ -41,7 +41,8 @@ public:
 		bool isMDown,
 		const glm::vec2& position,
 		const glm::vec2& direction,
-		std::vector<Bullet>& bullets
+		std::vector<Bullet>& bullets,
+		float deltaTime
 	);
 
 private:

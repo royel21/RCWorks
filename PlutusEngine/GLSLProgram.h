@@ -1,9 +1,20 @@
 #pragma once
 #include <iostream>
 #include <GL/glew.h>
+#include <unordered_map>
+#include <string>
+
 namespace PlutusEngine {
 	class GLSLProgram
 	{
+	private:
+		int _numAtributes;
+
+		GLuint _programID;
+		GLuint _vertexShaderID;
+		GLuint _fragmentShaderID;
+		std::unordered_map<std::string, GLint> uniformLocationsMap;
+
 	public:
 		GLSLProgram();
 		~GLSLProgram();
@@ -21,12 +32,6 @@ namespace PlutusEngine {
 		void unuse();
 
 	private:
-		int _numAtributes;
-
-		GLuint _programID;
-		GLuint _vertexShaderID;
-		GLuint _fragmentShaderID;
-
 		void compileShader(const char* shaderdata, GLuint id);
 	};
 

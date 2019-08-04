@@ -3,10 +3,13 @@
 #include <algorithm>
 #include <PlutusEngine/vertex.h>
 
+#define LOG(X, Y) std::cout << X <<" "<< Y << "\n\n" ;
+
 Character::Character() :
 	_health(0),
 	_speed(0),
 	_width(60.0f),
+	_lastPosition(0),
 	_height(60.0f),
 	_position(0),
 	_texture()
@@ -22,21 +25,46 @@ Character::~Character()
 bool Character::collideWithLevel(const std::vector<std::string>& levelData)
 {
 	std::vector<glm::vec2> collideTilePosition;
+	float x = _position.x - _lastPosition.x;
+	float y = _position.y - _lastPosition.y;
+	//LOG(x, y);
+	if (x != 0) {
+		if (x > 0) {
 
-	// Check the for corners
-	// First corner
-	checkTilePosition(collideTilePosition, levelData, _position.x, _position.y);
-	// First corner
-	checkTilePosition(collideTilePosition, levelData, _position.x + CHARAC_WIDTH, _position.y);
-	// First corner
-	checkTilePosition(collideTilePosition, levelData, _position.x, _position.y + CHARAC_WIDTH);
-	// First corner
-	checkTilePosition(collideTilePosition, levelData, _position.x + CHARAC_WIDTH, _position.y + CHARAC_WIDTH);
+			// top left corner
+			checkTilePosition(collideTilePosition, levelData, _position.x + CHARAC_WIDTH, _position.y + CHARAC_WIDTH);
 
+			// bottom left corner
+			checkTilePosition(collideTilePosition, levelData, _position.x + CHARAC_WIDTH, _position.y);
+		}
+		else {
+			// top right corner
+			checkTilePosition(collideTilePosition, levelData, _position.x, _position.y + CHARAC_WIDTH);
+			// bottom right corner
+			checkTilePosition(collideTilePosition, levelData, _position.x, _position.y);
+		}
+	}
+
+	if (y != 0) {
+		if (y < 0) {
+			// bottom left corner
+			checkTilePosition(collideTilePosition, levelData, _position.x + CHARAC_WIDTH, _position.y);
+			// bottom right corner
+			checkTilePosition(collideTilePosition, levelData, _position.x, _position.y);
+		}
+		else {
+			// top right corner
+			checkTilePosition(collideTilePosition, levelData, _position.x, _position.y + CHARAC_WIDTH);
+			// top left corner
+			checkTilePosition(collideTilePosition, levelData, _position.x + CHARAC_WIDTH, _position.y + CHARAC_WIDTH);
+		}
+	}
+	
 	for (size_t i = 0; i < collideTilePosition.size(); i++)
 	{
 		collideWithTile(collideTilePosition[i]);
 	}
+	_lastPosition = _position;
 	return collideTilePosition.size() ? true : false;
 }
 
@@ -124,4 +152,22 @@ void Character::draw(PlutusEngine::SpriteBatch& _spriteBatch)
 bool Character::applyDamage(int damage) {
 	_health -= damage;
 	return _health <= 1;
+}
+
+Character* Character::getNearestCharacter(std::vector<Character*>& character, float distance)
+{
+	Character* closestCharacter = nullptr;
+	float smallestDistance = distance;
+	for (size_t i = 0; i < character.size(); i++)
+	{
+		glm::vec2 distVec = character[i]->getPosition() - _position;
+		float distance = glm::length(distVec);
+
+		if (distance < smallestDistance) {
+			smallestDistance = distance;
+			closestCharacter = character[i];
+		}
+	}
+
+	return closestCharacter;
 }

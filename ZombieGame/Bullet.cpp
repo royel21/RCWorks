@@ -63,8 +63,8 @@ bool Bullet::collideWithCharacter(Character* chara)
 
 bool Bullet::collideWithWorld(const std::vector<std::string>& levelData)
 {
-	int nX = floor(_position.x / (float)TILE_WIDTH);
-	int nY = floor(_position.y / (float)TILE_WIDTH);
+	int nX = (int)floor(_position.x / (float)TILE_WIDTH);
+	int nY = (int)floor(_position.y / (float)TILE_WIDTH);
 	if (nY < 0 || nX < 0 || nY > (int)levelData.size()-1 || nX > (int)levelData[0].size()-1) return true;
 
 	return (levelData[nY][nX] != '.');

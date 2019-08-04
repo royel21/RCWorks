@@ -14,6 +14,7 @@ void Human::init(float speed, glm::vec2 pos)
 {
 	_speed = speed;
 	_position = pos;
+	_lastPosition = pos;
 	//Asign the character sprite
 	_texture = PlutusEngine::ResourceManager::getTexture("resources/textures/human.png");
 
@@ -41,8 +42,9 @@ void Human::update(const std::vector<std::string>& levelData,
 	static std::mt19937 randomEngine((uint32_t)time(nullptr));
 	static std::uniform_real_distribution<float> randRotate(-40.0f, 40.0f);
 	
-	Zombie* closestZombies = getNearestZombie(zombies);
+	Zombie* closestZombies = (Zombie*)getNearestCharacter((std::vector<Character*>&)zombies, 999.0f);
 
+	//Run from the zombies
 	if (closestZombies != nullptr) {
 		glm::vec2 distVec = glm::normalize(closestZombies->getPosition() - _position);
 		_position -= _direction + distVec * _speed * deltaTime;
@@ -56,23 +58,4 @@ void Human::update(const std::vector<std::string>& levelData,
 	{
 		_direction = glm::rotate(_direction, randRotate(randomEngine));
 	}
-}
-
-
-Zombie* Human::getNearestZombie(std::vector<Zombie*>& zombie)
-{
-	Zombie* closestZombie = nullptr;
-	float smallestDistance = 9999.f;
-	for (size_t i = 0; i < zombie.size(); i++)
-	{
-		glm::vec2 distVec = zombie[i]->getPosition() - _position;
-		float distance = glm::length(distVec);
-
-		if (distance < smallestDistance) {
-			smallestDistance = distance;
-			closestZombie = zombie[i];
-		}
-	}
-
-	return closestZombie;
 }

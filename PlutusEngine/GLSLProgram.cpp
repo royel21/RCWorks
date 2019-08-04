@@ -90,10 +90,14 @@ namespace PlutusEngine {
 
 	GLint GLSLProgram::getUniformLocation(const std::string& uniformName)
 	{
+		if (uniformLocationsMap.find(uniformName) != uniformLocationsMap.end())
+			return uniformLocationsMap[uniformName];
+
 		GLuint location = glGetUniformLocation(_programID, uniformName.c_str());
 		if (location == GL_INVALID_INDEX) {
 			PlutusEngine::fatalError("Uniform " + uniformName + " not found in shader");
 		}
+		uniformLocationsMap[uniformName] = location;
 
 		return location;
 	}
@@ -118,23 +122,6 @@ namespace PlutusEngine {
 
 	void GLSLProgram::compileShader(const char* shaderdata, GLuint id)
 	{
-
-		/*std::ifstream vertexFile(filePath);
-		if (vertexFile.fail()) {
-			perror(filePath.c_str());
-			PlutusEngine::fatalError("fail to open vertex file");
-		}
-		std::string fileContent;
-		std::string line;
-
-		while (std::getline(vertexFile, line)) {
-			fileContent += line + "\n";
-		}
-
-		vertexFile.close();*/
-
-		//const char* contentPr = fileContent.c_str();
-
 		glShaderSource(id, 1, &shaderdata, nullptr);
 
 		GLint success = 0;

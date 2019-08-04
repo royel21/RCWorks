@@ -15,7 +15,5 @@ public:
 	virtual void update(const std::vector<std::string>& levelData,
 		std::vector<Human*>& humans,
 		std::vector<Zombie*>& zombies, float deltaTime);
-private:
-	Zombie* getNearestZombie(std::vector<Zombie*>& zombie);
 };
 

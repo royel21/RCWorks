@@ -4,23 +4,40 @@
 #include <iostream>
 #include <vector>
 
+class MyClass
+{
+public:
+	std::vector<int>& _vecPointer;
+	MyClass(std::vector<int>& vecPointer) : _vecPointer(vecPointer)
+	{
+	}
+
+	~MyClass()
+	{
+	}
+
+	void printVec() {
+		for (int i = 0; i < (int)_vecPointer.size(); i++) {
+			std::cout << _vecPointer.data()[i] << "\n";
+		}
+	}
+private:
+
+};
+
+
 int main()
 {
 
-	std::vector<int*> vec;
-	for (size_t i = 0; i < 20; i++)
+	std::vector<int> vec;
+	/*for (size_t i = 0; i < 20; i++)
 	{
-		vec.push_back(new int(i));
-	}
+		vec.push_back(i);
+	}*/
 
-	for (int i = (int)vec.size()-1; i > -1; i--) {
-		if (i == 8) {
-			delete vec[i];
-			vec.erase(vec.begin() + i);
-		}
-		std::cout << *vec[i] << std::endl;
-	}
-	std::cout << vec.size() << std::endl;
+	MyClass tclass(vec);
+
+	tclass.printVec();
 
 	std::cin.get();
 }

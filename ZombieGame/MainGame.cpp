@@ -3,21 +3,25 @@
 #include <ctime>
 #include <random>
 #include <assert.h>
+#include <algorithm>
 
 #include "vertexshaders.h"
 #include "fragshaders.h"
 
+const int MAX_PHYSICS_STEPS = 6;
+
 const float HUMAN_SPEED = 1.0f;
 const float ZOMBIE_SPEED = 1.3f;
-float const CAMERA_SCALE = 4.0f;
-float const DESIRE_FPS = 60.0f;
-float const MS_PER_SECOND = 1000.0f;
-float const DESIRED_FRAMETIME = MS_PER_SECOND / DESIRE_FPS;
+const float CAMERA_SCALE = 2.0f;
+const float DESIRE_FPS = 60.0f;
+const float MS_PER_SECOND = 1000.0f;
+const float MAX_DELTATIME = 1.0f;
+const float DESIRED_FRAMETIME = MS_PER_SECOND / DESIRE_FPS;
 
 MainGame::MainGame() :
 	_screenHeight(768),
 	_screenWidth(1024),
-	_maxFPS(60.0f),
+	_maxFPS(30.0f),
 	_fps(0.0f),
 	_currentLevel(0),
 	_nHumansKilled(0),
@@ -101,24 +105,34 @@ void MainGame::initLevel()
 void MainGame::gameLoop() {
 
 
-	_fpsLimiter.setMaxFPS(DESIRE_FPS);
+	_fpsLimiter.setMaxFPS(60);
 	_camera.setScale(CAMERA_SCALE);
-	float lastTick = SDL_GetTicks();
+	uint32_t lastTick = SDL_GetTicks();
 
 	while (_gameState != GameState::EXIT) {
 		_fpsLimiter.begin();
 
-		float frameTime = SDL_GetTicks() - lastTick;
+
+		uint32_t newTick = SDL_GetTicks();
+		float frameTime = (float)(newTick - lastTick);
+		lastTick = newTick;
+
+		float totalDeltaTime = frameTime / DESIRED_FRAMETIME;
 
 		_inputManager.update();
 
-		CheckWinCondition();
+		//CheckWinCondition();
 
 		processInput();
 
-		updateCharacters(1.0f);
-
-		updateBullets(1.0f);
+		int i = 0;
+		while (totalDeltaTime > 0.0f && i < MAX_PHYSICS_STEPS) {
+			float deltaTime = std::min(totalDeltaTime, MAX_DELTATIME);
+			updateCharacters(deltaTime);
+			updateBullets(deltaTime);
+			totalDeltaTime -= deltaTime;
+			i++;
+		}
 
 		//Update the camera relative to the player
 		_camera.setPosition(_player->getPosition());
@@ -239,10 +253,10 @@ void MainGame::CheckWinCondition()
 {
 
 	if (_zombies.empty()) {
-		std::printf("You Won!, you killed %d Humans and killed %d Zombies, Humans left %d/%d", 
+		std::printf("You Won!, you killed %d Humans and killed %d Zombies, Humans left %d/%d \n", 
 			_nHumansKilled , 
 			_nZombiesKilled, 
-			_humans.size()-1, 
+			(int)_humans.size()-1, 
 			(int)_levels[_currentLevel]->getNumHumans());
 	}
 }
@@ -305,23 +319,30 @@ void MainGame::drawGame() {
 
 	_spriteBatch.begin();
 
+	const glm::vec2 characDim(CharacRadius*2);
 
 	//Draw the humans
 	for (auto h : _humans)
 	{
-		h->draw(_spriteBatch);
+		if (_camera.isBoxInView(h->getPosition(), characDim)) {
+			h->draw(_spriteBatch);
+		}
 	}
 
 	//Draw the Zombies
 	for (auto z : _zombies)
 	{
-		z->draw(_spriteBatch);
+		if (_camera.isBoxInView(z->getPosition(), characDim)) {
+			z->draw(_spriteBatch);
+		}
 	}
 
 	//Draw all the bullets
 	for (auto b : _bullets)
 	{
-		b.draw(_spriteBatch);
+		if (_camera.isBoxInView(b.getPosition(), characDim)) {
+			b.draw(_spriteBatch);
+		}
 	}
 
 	_spriteBatch.end();

@@ -30,6 +30,7 @@ namespace PlutusEngine {
 	};
 
 	struct Vertex {
+		Vertex() : position(), uv() {}
 		Position position;
 		ColorRGBA8 color;
 		UV uv;

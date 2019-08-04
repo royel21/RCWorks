@@ -4,6 +4,15 @@
 namespace PlutusEngine {
 	class Camera2D
 	{
+	private:
+		int _screenWidth;
+		int _screenHeight;
+		bool _needsMatrixUpdate;
+		float _scale;
+		glm::vec2 _position;
+		glm::mat4 _cameraMatrix;
+		glm::mat4 _orthoMatrix;
+
 	public:
 		Camera2D();
 		~Camera2D();
@@ -20,14 +29,7 @@ namespace PlutusEngine {
 		glm::mat4 getCameraMatrix() { return _cameraMatrix; }
 		float getScale() { return _scale; }
 
+		bool isBoxInView(const glm::vec2 position, const glm::vec2 dim);
 
-	private:
-		int _screenWidth;
-		int _screenHeight;
-		bool _needsMatrixUpdate;
-		float _scale;
-		glm::vec2 _position;
-		glm::mat4 _cameraMatrix;
-		glm::mat4 _orthoMatrix;
 	};
 }

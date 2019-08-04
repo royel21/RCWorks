@@ -58,4 +58,26 @@ namespace PlutusEngine {
 
 		return screenCoords;
 	}
+
+	bool Camera2D::isBoxInView(const glm::vec2 position, const glm::vec2 dim)
+	{
+		glm::vec2 scaleDim = glm::vec2(_screenWidth ,_screenHeight) / _scale;
+
+		const float MIN_DISTANCE_X = dim.x / 2.0f + scaleDim.x / 2.0f;
+		const float MIN_DISTANCE_Y = dim.y / 2.0f + scaleDim.y / 2.0f;
+
+		glm::vec2 centerPos = position + dim / 2.0f;
+
+		glm::vec2 distVec = centerPos - _position;
+
+		float xDepth = MIN_DISTANCE_X - abs(distVec.x);
+		float yDepth = MIN_DISTANCE_Y - abs(distVec.y);
+
+		if (xDepth > 0 && yDepth > 0)
+		{
+			return true;
+		}
+		
+		return false;
+	}
 }

@@ -24,7 +24,8 @@ Gun::Gun(
 	float spread,
 	float bulletSpeed,
 	std::string imgName) :
-	_gunName(gunName)
+	_gunName(gunName),
+	_width(0), _height(0)
 
 {
 	_position = glm::vec2(position);
@@ -55,8 +56,10 @@ void Gun::update(
 	bool isMDown,
 	const glm::vec2& position,
 	const glm::vec2& direction,
-	std::vector<Bullet>& bullets)
+	std::vector<Bullet>& bullets, float deltaTime)
 {
+	_frameCount += 1.0f * deltaTime;
+
 	if (_frameCount >= _fireRate && isMDown) {
 		fire(position, direction, bullets);
 		_frameCount = 0;

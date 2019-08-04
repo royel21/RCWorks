@@ -30,42 +30,24 @@ namespace PlutusEngine {
 	{
 		_sortType = sortType;
 		_renderBatches.clear();
-		for (size_t i = 0; i < _glyphs.size(); i++)
-		{
-			delete _glyphs[i];
-		}
 		_glyphs.clear();
 	}
 
 	void SpriteBatch::end()
 	{
+		_glyphPonters.resize(_glyphs.size());
+		for (size_t i = 0; i < _glyphs.size(); i++)
+		{
+			_glyphPonters[i] = &_glyphs[i];
+		}
+
 		sortGlyph();
 		createRenderBatches();
 	}
 
 	void SpriteBatch::draw(const glm::vec4& destRec, const glm::vec4& uvRect, const GLuint texture, float depth, ColorRGBA8& color)
 	{
-		Glyph* newGlyph = new Glyph;
-		newGlyph->texture = texture;
-		newGlyph->depth = depth;
-
-		newGlyph->topLeft.color = color;
-		newGlyph->topLeft.setPosition(destRec.x, destRec.y + destRec.w);
-		newGlyph->topLeft.setUV(uvRect.x, uvRect.y + uvRect.w);
-
-		newGlyph->bottomLeft.color = color;
-		newGlyph->bottomLeft.setPosition(destRec.x, destRec.y);
-		newGlyph->bottomLeft.setUV(uvRect.x, uvRect.y);
-
-		newGlyph->bottomRight.color = color;
-		newGlyph->bottomRight.setPosition(destRec.x + destRec.z, destRec.y);
-		newGlyph->bottomRight.setUV(uvRect.x + uvRect.z, uvRect.y);
-
-		newGlyph->topRight.color = color;
-		newGlyph->topRight.setPosition(destRec.x + destRec.z, destRec.y + destRec.w);
-		newGlyph->topRight.setUV(uvRect.x + uvRect.z, uvRect.y + uvRect.w);
-		
-		_glyphs.push_back(newGlyph);
+		_glyphs.emplace_back(destRec, uvRect, texture, depth, color);
 	}
 
 	void SpriteBatch::renderBatch()
@@ -90,32 +72,32 @@ namespace PlutusEngine {
 		int offset = 0;
 		int cv = 0; //Current Vertex
 		//Create and add a new RenderBatch
-		_renderBatches.emplace_back(offset, 6, _glyphs[0]->texture);
+		_renderBatches.emplace_back(offset, 6, _glyphPonters[0]->texture);
 
-		vertices[cv++] = _glyphs[0]->topLeft;
-		vertices[cv++] = _glyphs[0]->bottomLeft;
-		vertices[cv++] = _glyphs[0]->bottomRight;
-		vertices[cv++] = _glyphs[0]->bottomRight;
-		vertices[cv++] = _glyphs[0]->topRight;
-		vertices[cv++] = _glyphs[0]->topLeft;
+		vertices[cv++] = _glyphPonters[0]->topLeft;
+		vertices[cv++] = _glyphPonters[0]->bottomLeft;
+		vertices[cv++] = _glyphPonters[0]->bottomRight;
+		vertices[cv++] = _glyphPonters[0]->bottomRight;
+		vertices[cv++] = _glyphPonters[0]->topRight;
+		vertices[cv++] = _glyphPonters[0]->topLeft;
 
 		offset += 6;
 
-		for (size_t cg = 1; cg < _glyphs.size(); cg++) {
-			if (_glyphs[cg]->texture != _glyphs[cg - 1]->texture) {
-				_renderBatches.emplace_back(offset, 6, _glyphs[cg]->texture);
+		for (size_t cg = 1; cg < _glyphPonters.size(); cg++) {
+			if (_glyphPonters[cg]->texture != _glyphPonters[cg - 1]->texture) {
+				_renderBatches.emplace_back(offset, 6, _glyphPonters[cg]->texture);
 			}
 			else {
 				_renderBatches.back().numVertices += 6;
 			}
 			
 
-			vertices[cv++] = _glyphs[cg]->topLeft;
-			vertices[cv++] = _glyphs[cg]->bottomLeft;
-			vertices[cv++] = _glyphs[cg]->bottomRight;
-			vertices[cv++] = _glyphs[cg]->bottomRight;
-			vertices[cv++] = _glyphs[cg]->topRight;
-			vertices[cv++] = _glyphs[cg]->topLeft;
+			vertices[cv++] = _glyphPonters[cg]->topLeft;
+			vertices[cv++] = _glyphPonters[cg]->bottomLeft;
+			vertices[cv++] = _glyphPonters[cg]->bottomRight;
+			vertices[cv++] = _glyphPonters[cg]->bottomRight;
+			vertices[cv++] = _glyphPonters[cg]->topRight;
+			vertices[cv++] = _glyphPonters[cg]->topLeft;
 			offset += 6;
 		}
 
@@ -163,13 +145,13 @@ namespace PlutusEngine {
 		case PlutusEngine::GlyphSortType::NONE:
 			break;
 		case PlutusEngine::GlyphSortType::FRONT_TO_BACK:
-			std::stable_sort(_glyphs.begin(), _glyphs.end(), compareFrontToBack);
+			std::stable_sort(_glyphPonters.begin(), _glyphPonters.end(), compareFrontToBack);
 			break;
 		case PlutusEngine::GlyphSortType::BACK_TO_FRONT:
-			std::stable_sort(_glyphs.begin(), _glyphs.end(), compareBackToFront);
+			std::stable_sort(_glyphPonters.begin(), _glyphPonters.end(), compareBackToFront);
 			break;
 		case PlutusEngine::GlyphSortType::TEXTURE:
-			std::stable_sort(_glyphs.begin(), _glyphs.end(), compareTexture);
+			std::stable_sort(_glyphPonters.begin(), _glyphPonters.end(), compareTexture);
 			break;
 		default:
 			break;

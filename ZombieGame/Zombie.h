@@ -4,7 +4,6 @@
 class Zombie : public Character
 {
 private:
-	Human* getNearestHuman(std::vector<Human*>& humans);
 	glm::vec2 _direction;
 	int _frame;
 
