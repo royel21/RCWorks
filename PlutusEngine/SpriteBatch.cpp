@@ -85,13 +85,13 @@ namespace PlutusEngine {
 
 		for (size_t cg = 1; cg < _glyphPonters.size(); cg++) {
 			if (_glyphPonters[cg]->texture != _glyphPonters[cg - 1]->texture) {
+
 				_renderBatches.emplace_back(offset, 6, _glyphPonters[cg]->texture);
 			}
 			else {
 				_renderBatches.back().numVertices += 6;
 			}
 			
-
 			vertices[cv++] = _glyphPonters[cg]->topLeft;
 			vertices[cv++] = _glyphPonters[cg]->bottomLeft;
 			vertices[cv++] = _glyphPonters[cg]->bottomRight;
@@ -124,20 +124,21 @@ namespace PlutusEngine {
 		}
 		glBindBuffer(GL_ARRAY_BUFFER, _vbo);
 
-		/* Tell OpenGL that we want to use vertexPosition is in location 0*/
+		/* Tell OpenGL that we want to use vertexPosition and its location is 0*/
 		glEnableVertexAttribArray(0);
 		glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, position));
 
-		/* Tell OpenGL that we want to use vertexColor is in location 1*/
+		/* Tell OpenGL that we want to use vertexColor and its location is1*/
 		glEnableVertexAttribArray(1);
 		glVertexAttribPointer(1, 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(Vertex), (void*)offsetof(Vertex, color));
 
-		/* Tell OpenGL that we want to use vertexUV is in location 2*/
+		/* Tell OpenGL that we want to use vertexUV and its location is 2*/
 		glEnableVertexAttribArray(2);
 		glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (void*)offsetof(Vertex, uv));
 
 		glBindVertexArray(0);
 	}
+
 	void SpriteBatch::sortGlyph()
 	{
 		switch (_sortType)
@@ -162,10 +163,12 @@ namespace PlutusEngine {
 	{
 		return (a->depth < b->depth);
 	}
+
 	bool SpriteBatch::compareBackToFront(Glyph* a, Glyph* b)
 	{
 		return (a->depth > b->depth);
 	}
+
 	bool SpriteBatch::compareTexture(Glyph* a, Glyph* b)
 	{
 		return (a->texture < b->texture);
