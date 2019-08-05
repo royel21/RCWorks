@@ -47,11 +47,11 @@ void Human::update(const std::vector<std::string>& levelData,
 	//Run from the zombies
 	if (closestZombies != nullptr) {
 		glm::vec2 distVec = glm::normalize(closestZombies->getPosition() - _position);
-		_position -= _direction + distVec * _speed * deltaTime;
+		_position -= _direction + distVec * (_speed + 0.2f )* deltaTime;
 	}
 	else
 	{
-		_position += _direction * _speed * deltaTime;
+		_position += _speed * deltaTime;
 	}
 
 	if (collideWithLevel(levelData))
